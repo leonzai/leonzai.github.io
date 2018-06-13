@@ -248,7 +248,7 @@
     'use strict';
 
     var urlRoot = '/education/students';
-    var collection = [{"id":28,"name":"3","number":"3","phone":"3","call":"3"},{"id":26,"name":"1","number":"1","phone":"1","call":"'"},{"id":5,"name":"\u5f20\u4eae","number":"1","phone":"13338825223","call":"\u53d4\u53d4"},{"id":3,"name":"\u5b59\u6d69","number":"3","phone":"13057031096","call":"\u5927\u795e"},{"id":2,"name":"\u5c4e\u822a\u7a0b","number":"2","phone":"15295622437","call":"\u5988\u5988"}];
+    var collection = [{"id":28,"name":"3","number":"3","phone":"3","call":"3"},{"id":26,"name":"1","number":"1","phone":"1","call":"'"},{"id":5,"name":"\u5f20\u4eae","number":"1","phone":"13338825823","call":"\u53d4\u53d4"},{"id":3,"name":"\u5b59\u6d69","number":"3","phone":"13557031096","call":"\u5927\u795e"},{"id":2,"name":"\u5c4e\u822a\u7a0b","number":"2","phone":"15295622497","call":"\u5988\u5988"}];
     var searchFields = ['name', 'number'];
     var app = new Vue({
         el: '#app',
@@ -284,7 +284,7 @@
             update: function update() {
                 var index = this.getIndexById(this.item.id);
                 // axios.post(urlRoot + '/' + app.item.id, {
-                    {{--'_token': '{{ csrf_token() }}',--}}
+                   // {{--'_token': '{{ csrf_token() }}',--}}
                     // '_method': 'patch',
                     // 'data': app.item
                 // }).then(function () {
@@ -333,7 +333,7 @@
                 }).then(function (result) {
                     if (result.value) {
                         // axios.post(urlRoot + '/' + object.id, {
-                            {{--'_token': '{{ csrf_token() }}',--}}
+                          //  {{--'_token': '{{ csrf_token() }}',--}}
                             // '_method': 'delete'
                         // }).then(function () {
                             app.collection.splice(app.getIndexById(object.id), 1);
