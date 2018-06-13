@@ -134,25 +134,27 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 
-    let urlRoot = '...';
-    let collection =[{"id":4,"name":"\u8d75\u516d","number":"25","phone":"15862740318","call":"\u5988\u5988"},{"id":3,"name":"\u738b\u4e94","number":"4","phone":"1352235445","call":"\u5988\u5988"},{"id":2,"name":"\u674e\u56db","number":"2","phone":"18525356523","call":"\u5988\u5988"},{"id":1,"name":"\u5f20\u4e09","number":"1","phone":"13338865223","call":"\u7238\u7238"}];
-    let searchFields = ['name', 'number'];
-    let app = new Vue({
+    'use strict';
+
+    var urlRoot = '/education/students';
+    var collection = [{"id":28,"name":"3","number":"3","phone":"3","call":"3"},{"id":26,"name":"1","number":"1","phone":"1","call":"'"},{"id":5,"name":"\u5f20\u4eae","number":"1","phone":"13338825223","call":"\u53d4\u53d4"},{"id":3,"name":"\u5b59\u6d69","number":"3","phone":"13057031096","call":"\u5927\u795e"},{"id":2,"name":"\u5c4e\u822a\u7a0b","number":"2","phone":"15295622437","call":"\u5988\u5988"}];
+    var searchFields = ['name', 'number'];
+    var app = new Vue({
         el: '#app',
         data: {
-            collection,
+            collection: collection,
             searchList: [],
             list: [],
             item: {},
-            searchField: '',   // 搜索框里的 字段
+            searchField: '', // 搜索框里的 字段
             showForm: false
         },
-        created() {
+        created: function created() {
             this.reset();
         },
         methods: {
             // 在搜索为空，增删改时候，需要初始化
-            reset() {
+            reset: function reset() {
                 this.list = this.collection;
                 this.item = {};
                 this.searchField = '';
@@ -160,7 +162,7 @@
             },
 
             // 提交表单，可能是更新，也可能是新增
-            submit() {
+            submit: function submit() {
                 if (this.item.id) {
                     this.update();
                 } else {
@@ -168,25 +170,25 @@
                 }
             },
 
-            update() {
-                let index = this.getIndexById(this.item.id);
+            update: function update() {
+                var index = this.getIndexById(this.item.id);
                 // axios.post(urlRoot + '/' + app.item.id, {
-                //     '_token': 'lxkEeGtPgUmOaJ3vkOXEdIb0jDc9pjXsk1rQtti0',
-                //     '_method': 'patch',
-                //     'data': app.item
+                    {{--'_token': '{{ csrf_token() }}',--}}
+                    // '_method': 'patch',
+                    // 'data': app.item
                 // }).then(function () {
                     app.collection[index] = app.item;
                     app.reset();
-                // }).catch(error=>{
+                // }).catch(function (error) {
                 //     app.alertError(error);
                 // });
             },
 
-
-            addItem() {
+            addItem: function addItem() {
                 // axios.post(urlRoot, {
                 //     data: this.item
-                // }).then(function (id) {
+                // }).then(function (response) {
+                //     app.item.id = response.data;
                     app.item.id = Math.floor(Math.random()*1000000);
                     app.collection.unshift(app.item);
                     app.reset();
@@ -195,68 +197,66 @@
                 // });
             },
 
-            alertError(error) {
-                let errors=error.response.data.errors;
-                for(let key in errors){
+            alertError: function alertError(error) {
+                var errors = error.response.data.errors;
+                for (var key in errors) {
                     swal(errors[key][0]);
                     break;
                 }
             },
-            formDisplay() {
+            formDisplay: function formDisplay() {
                 this.showForm = true;
             },
 
-            edit(object) {
+            edit: function edit(object) {
                 this.item = object;
                 this.formDisplay();
             },
 
-            del(object) {
+            del: function del(object) {
                 swal({
                     title: '确定删除？',
                     showCancelButton: true,
                     cancelButtonText: '取消',
                     confirmButtonText: '确定'
-                }).then((result) => {
+                }).then(function (result) {
                     if (result.value) {
                         // axios.post(urlRoot + '/' + object.id, {
-                        //     '_token': 'lxkEeGtPgUmOaJ3vkOXEdIb0jDc9pjXsk1rQtti0',
-                        //     '_method': 'delete'
+                            {{--'_token': '{{ csrf_token() }}',--}}
+                            // '_method': 'delete'
                         // }).then(function () {
                             app.collection.splice(app.getIndexById(object.id), 1);
                             app.reset();
                         // });
                     }
-                })
+                });
             },
 
-
-            getIndexById(id) {
-                for (let i = 0; i < this.collection.length; i++) {
+            getIndexById: function getIndexById(id) {
+                for (var i = 0; i < this.collection.length; i++) {
                     if (this.collection[i].id === id) {
                         return i;
                     }
                 }
             },
 
-            search(event) {
+            search: function search(event) {
                 console.log('searching');
-                let searchValue = event.target.value;
+                var searchValue = event.target.value;
                 if (searchValue) {
                     this.list = [];
-                    this.collection.forEach((item) => {
-                        let itemToList = false;
-                        searchFields.forEach(field => {
-                                if (item[field].includes(searchValue)) {
-                                    itemToList = true;
-                                    if (!app.searchList.includes(item[field])) {
-                                        app.searchList.push(item[field]);
-                                    }
+                    this.collection.forEach(function (item) {
+                        var itemToList = false;
+                        searchFields.forEach(function (field) {
+                            if (item[field].includes(searchValue)) {
+                                itemToList = true;
+                                if (!app.searchList.includes(item[field])) {
+                                    app.searchList.push(item[field]);
                                 }
                             }
-                        );
+                        });
                         if (itemToList) {
-                            this.list.push(item);
+                            app.list.push(item);
                         }
                     });
                 } else {
