@@ -1,0 +1,270 @@
+
+
+<!doctype html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="http://trip.trip/css/common.css">
+    <script src="http://trip.trip/js/sweetalert2.js"></script>
+    <title>Vue 实现增删改查</title>
+    <style>
+        body {
+            background: url('http://trip.trip/storage/bubble_bg.jpg') no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body >
+<div class="container">
+    <div class="row" id="app">
+        <div class="card mx-auto my-5">
+            <h3 class="card-header">
+                Vue 实现增删改查
+            </h3>
+            <div class="card-body">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">搜索</span>
+                    </div>
+                    <input type="text" @input="search" @focus="search" list="search" class="form-control"
+                           v-model="searchField">
+                    <datalist id="search">
+                        <option v-for="item in searchList" :value="item"></option>
+                    </datalist>
+                    <div class="input-group-append">
+                        <button class="btn btn-success" @click="formDisplay" type="button">新增</button>
+                    </div>
+                </div>
+
+                <table class="table" v-cloak>
+                    <thead>
+                    <tr class="text-primary">
+                        <th scope="col">姓名</th>
+                        <th scope="col">编号</th>
+                        <th scope="col">手机号</th>
+                        <th scope="col">称呼</th>
+                        <th scope="col">编辑</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <tr v-for="(object) of list">
+                        <td>{{ object.name }}</td>
+                        <th>{{ object.number }}</th>
+                        <td>{{ object.phone }}</td>
+                        <td>{{ object.call }}</td>
+                        <td>
+                            <span @click="edit(object)" class="btn btn-primary btn-sm">编辑</span>
+                            <span @click="del(object)" class="btn btn-danger btn-sm">删除</span>
+                        </td>
+                    </tr>
+
+
+                    </tbody>
+                </table>
+
+
+                <div class="modal" tabindex="-1" v-show="showForm" v-cloak>
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title"><!-- 表单 --></h5>
+                                <button type="button" class="close" @click="reset()">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="form" class="d-non e">
+                                    <input type="hidden" class="swal2-input" v-model="item.id">
+                                    <div class="form-group">
+                                        <label>姓名</label>
+                                        <input type="text" class="form-control" v-model="item.name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>编号</label>
+                                        <input type="number" class="form-control" v-model="item.number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>手机号</label>
+                                        <input type="number" class="form-control" v-model="item.phone">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>称呼</label>
+                                        <input type="text" class="form-control" v-model="item.call">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @click="reset()" data-dismiss="modal">关闭
+                                </button>
+                                <button type="button" @click="submit()" class="btn btn-primary">提交</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="mask" v-show="showForm"></div>
+
+    </div>
+</div>
+<div class="flash d-none
+        bg-success" id="flash">
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script>
+    if ('' || '') {
+        document.getElementById('flash').style.display = 'block';
+    }
+</script>
+<div class="flash d-none bg-danger" id="flash">
+
+</div>
+<script>
+    if ('') {
+        document.getElementById('flash').style.display = 'block';
+    }
+</script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+
+    let urlRoot = '...';
+    let collection =[{"id":4,"name":"\u8d75\u516d","number":"25","phone":"15862740318","call":"\u5988\u5988"},{"id":3,"name":"\u738b\u4e94","number":"4","phone":"1352235445","call":"\u5988\u5988"},{"id":2,"name":"\u674e\u56db","number":"2","phone":"18525356523","call":"\u5988\u5988"},{"id":1,"name":"\u5f20\u4e09","number":"1","phone":"13338865223","call":"\u7238\u7238"}];
+    let searchFields = ['name', 'number'];
+    let app = new Vue({
+        el: '#app',
+        data: {
+            collection,
+            searchList: [],
+            list: [],
+            item: {},
+            searchField: '',   // 搜索框里的 字段
+            showForm: false
+        },
+        created() {
+            this.reset();
+        },
+        methods: {
+            // 在搜索为空，增删改时候，需要初始化
+            reset() {
+                this.list = this.collection;
+                this.item = {};
+                this.searchField = '';
+                this.showForm = false;
+            },
+
+            // 提交表单，可能是更新，也可能是新增
+            submit() {
+                if (this.item.id) {
+                    this.update();
+                } else {
+                    this.addItem();
+                }
+            },
+
+            update() {
+                let index = this.getIndexById(this.item.id);
+                // axios.post(urlRoot + '/' + app.item.id, {
+                //     '_token': 'lxkEeGtPgUmOaJ3vkOXEdIb0jDc9pjXsk1rQtti0',
+                //     '_method': 'patch',
+                //     'data': app.item
+                // }).then(function () {
+                    app.collection[index] = app.item;
+                    app.reset();
+                // }).catch(error=>{
+                //     app.alertError(error);
+                // });
+            },
+
+
+            addItem() {
+                // axios.post(urlRoot, {
+                //     data: this.item
+                // }).then(function (id) {
+                    app.item.id = Math.floor(Math.random()*1000000);
+                    app.collection.unshift(app.item);
+                    app.reset();
+                // }).catch(function (error) {
+                //     app.alertError(error);
+                // });
+            },
+
+            alertError(error) {
+                let errors=error.response.data.errors;
+                for(let key in errors){
+                    swal(errors[key][0]);
+                    break;
+                }
+            },
+            formDisplay() {
+                this.showForm = true;
+            },
+
+            edit(object) {
+                this.item = object;
+                this.formDisplay();
+            },
+
+            del(object) {
+                swal({
+                    title: '确定删除？',
+                    showCancelButton: true,
+                    cancelButtonText: '取消',
+                    confirmButtonText: '确定'
+                }).then((result) => {
+                    if (result.value) {
+                        // axios.post(urlRoot + '/' + object.id, {
+                        //     '_token': 'lxkEeGtPgUmOaJ3vkOXEdIb0jDc9pjXsk1rQtti0',
+                        //     '_method': 'delete'
+                        // }).then(function () {
+                            app.collection.splice(app.getIndexById(object.id), 1);
+                            app.reset();
+                        // });
+                    }
+                })
+            },
+
+
+            getIndexById(id) {
+                for (let i = 0; i < this.collection.length; i++) {
+                    if (this.collection[i].id === id) {
+                        return i;
+                    }
+                }
+            },
+
+            search(event) {
+                console.log('searching');
+                let searchValue = event.target.value;
+                if (searchValue) {
+                    this.list = [];
+                    this.collection.forEach((item) => {
+                        let itemToList = false;
+                        searchFields.forEach(field => {
+                                if (item[field].includes(searchValue)) {
+                                    itemToList = true;
+                                    if (!app.searchList.includes(item[field])) {
+                                        app.searchList.push(item[field]);
+                                    }
+                                }
+                            }
+                        );
+                        if (itemToList) {
+                            this.list.push(item);
+                        }
+                    });
+                } else {
+                    this.reset();
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>
