@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://vuejs.org/js/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <title>Vue 实现增删改查</title>
     <style>
@@ -131,17 +131,15 @@
 <body>
 <div class="container">
     <div class="row" id="app">
-        <curd></curd>
-        <curd></curd>
-        <curd></curd>
-        <curd></curd>
+        <curd v-for="item in viewData" :collection="item.collection" :searchfields="item.searchfields"
+              :urlroot="item.urlroot"></curd>
     </div>
 </div>
 <div class="flash d-none bg-success" id="flash">
 
 </div>
 
-<template id='ttt'>
+<template id='template'>
     <div class="col-12 col-md-6 col-lg-6 my-5">
         <div class="card"><h3 class="card-header">Vue 实现增删改查</h3>
             <div class="card-body">
@@ -214,40 +212,16 @@
 <script>
     'use strict';
 
-    var urlRoot = '/education/students';
-    var collection = [{
-        "id": 28,
-        "name": "李小龙",
-        "phone": "1333552333",
-        "call": "阿姨"
-    }, {
-        "id": 26,
-        "name": "苗可秀",
-        "phone": "18512256234",
-        "call": "老师"
-    }, {
-        "id": 5,
-        "name": "张亮",
-        "phone": "13338825823",
-        "call": "叔叔"
-    }, {
-        "id": 3,
-        "name": "孙浩",
-        "phone": "13557031096",
-        "call": "大神"
-    }, {
-        "id": 2,
-        "name": "航程",
-        "number": "2",
-        "phone": "15295622497",
-        "call": "妈妈"
-    }];
-    var searchFields = ['name', 'phone'];
 
     var curd = {
+        props: [
+            'searchfields',
+            'urlroot',
+            'collection'
+
+        ],
         data: function data() {
             return {
-                collection: JSON.parse(JSON.stringify(collection)),
                 aPrompt: [],
                 list: [],
                 item: {},
@@ -256,7 +230,7 @@
                 prompt: 'prompt' + Math.floor(Math.random() * 1000000)
             };
         },
-        'template': '#ttt',
+        'template': '#template',
 
         created: function created() {
             this.reset();
@@ -283,7 +257,7 @@
             update: function update() {
                 var vm = this;
                 var index = vm.getIndexById(vm.item.id);
-                // axios.post(urlRoot + '/' + item.id, {
+                // axios.post(urlroot + '/' + item.id, {
                 // {{--'_token': '{{ csrf_token() }}',--}}
                 // '_method': 'patch',
                 // 'data': item
@@ -297,7 +271,7 @@
 
             store: function store() {
                 var vm = this;
-                // axios.post(urlRoot, {
+                // axios.post(urlroot, {
                 //     data: this.item
                 // }).then(function (response) {
                 //     item.id = response.data;
@@ -337,7 +311,7 @@
                     buttons: ['取消', '确定']
                 }).then(function (willDelete) {
                     if (willDelete) {
-                        // axios.post(urlRoot + '/' + item.id, {
+                        // axios.post(urlroot + '/' + item.id, {
                         //  {{--'_token': '{{ csrf_token() }}',--}}
                         // '_method': 'delete'
                         // }).then(function () {
@@ -364,7 +338,7 @@
                     vm.aPrompt = [];
                     vm.collection.forEach(function (item) {
                         var canPush = false;
-                        searchFields.forEach(function (field) {
+                        vm.searchfields.forEach(function (field) {
                             if (item[field].indexOf(vm.sInputText) !== -1) {
                                 canPush = true;
                                 if (vm.aPrompt.indexOf(item[field]) === -1) {
@@ -383,13 +357,49 @@
 
         }
     };
-
     new Vue({
         el: '#app',
         components: {
             'curd': curd
+        },
+        data: {
+            viewData: [
+                {
+                    urlroot: '/education/students',
+                    collection: [{
+                        "id": 28,
+                        "name": "李小龙",
+                        "phone": "1333552333",
+                        "call": "阿姨"
+                    }, {
+                        "id": 26,
+                        "name": "苗可秀",
+                        "phone": "18512256234",
+                        "call": "老师"
+                    }],
+                    searchfields: ['name', 'phone']
+                },
+
+
+                {
+                    urlroot: '/education/students',
+                    collection: [{
+                        "id": 28,
+                        "name": "玛丽莲",
+                        "phone": "0238524625123",
+                        "call": "明星"
+                    }, {
+                        "id": 26,
+                        "name": "穆罕穆德",
+                        "phone": "18512256234",
+                        "call": "拳王"
+                    }],
+                    searchfields: ['name', 'phone']
+                }
+            ]
         }
     });
+
 </script>
 </body>
 </html>
