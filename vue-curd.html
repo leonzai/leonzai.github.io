@@ -183,7 +183,7 @@
                 </table>
                 <div class="row col-11 offset-col-1">
                     <div class="form-check form-check-inline ml-2">
-                        <input type="checkbox" class="form-check-input" v-model="checkAllBtn" @click="checkAll">
+                        <input type="checkbox" class="form-check-input" v-model="checkAllBtn" @change="checkAll">
                         <label class="form-check-label text-light">
                             全选
                         </label>
@@ -386,7 +386,7 @@
                 }
             },
             checkAll: function checkAll() {
-                var isCheck = !this.checkAllBtn;
+                var isCheck = this.checkAllBtn;
                 this.list.forEach(function (item) {
                     item.checked = isCheck;
                 });
