@@ -170,7 +170,7 @@
                     <tr v-for="item in list" :key="item.id">
                         <td>
                             <input type="checkbox" class="form-check-input ml-2" v-model="item.checked"
-                                   @click.prevent="checkThis(item)">
+                                   @change="setCheckAllStatus">
                         </td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.phone }}</td>
@@ -414,12 +414,6 @@
                         break;
                     }
                 }
-            },
-
-            checkThis: function checkThis(item) {
-                item.checked = !item.checked;
-                this.setCheckAllStatus();
-
             },
 
             batchDelete: function batchDelete() {
