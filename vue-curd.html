@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en" class="">
 <head>
@@ -418,22 +419,24 @@
 
             batchDelete: function batchDelete() {
                 var vm = this;
-                swal({
+				var aDeleteId = [];
+				vm.list.forEach(function (item) {
+					if (item.checked) {
+						aDeleteId.push(item.id);
+					}
+				});
+				if(! aDeleteId.length){
+					swal({title: '请选择准备删除的数据！'});
+					return false;
+				}
+				swal({
                     title: '确定删除？',
                     buttons: ['取消', '确定']
                 }).then(function (willDelete) {
                     if (willDelete) {
-                        var aDeleteId = [];
-                        vm.list.forEach(function (item) {
-                            if (item.checked) {
-                                aDeleteId.push(item.id);
-                                vm.collection.splice(vm.getIndexById(item.id), 1);
-                            }
-                        });
-                        console.log(aDeleteId);
-                        //  {{--'_token': '{{ csrf_token() }}',--}}
-                        // '_method': 'delete'
-                        // }).then(function () {
+                        for(var id in aDeleteId){
+							vm.collection.splice(vm.getIndexById(aDeleteId[id]), 1);
+						}
                         vm.reset();
                     }
                 });
